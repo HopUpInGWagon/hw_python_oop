@@ -46,7 +46,7 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        pass
+        raise NotImplementedError
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о тренировке."""
@@ -59,9 +59,9 @@ class Running(Training):
     """Тренировка: бег."""
     CALORIES_MEAN_SPEED_MULTIPLIER: float = 18
     CALORIES_MEAN_SPEED_SHIFT: float = 1.79
-
-    def __init__(self, action, duration, weight):
-        super().__init__(action, duration, weight)
+# Чтобы сократить код убрал функцию init
+# По сути она повторяет то же что и в родительском классе
+# Смысла в ней здесь нет тк я ничего в нее не перезаписываю :)
 
     def get_spent_calories(self) -> float:
         """Получить количество калорий во время бега"""
@@ -71,23 +71,28 @@ class Running(Training):
 
 
 class SportsWalking(Training):
-    CAL_MULT_35: float = 0.035
-    CAL_MULT_29: float = 0.029
+    CALORIES_WEIGHT_COEF: float = 0.035
+    CALORIES_HEIGHT_COEF: float = 0.029
     KMH_TO_MS: float = 0.278
     CM_TO_M: int = 100
     """Тренировка: спортивная ходьба."""
 
-    def __init__(self, action, duration, weight, height):
+    def __init__(self,
+                 action: int,
+                 duration: float,
+                 weight: float,
+                 height: int
+                 ) -> None:
         super().__init__(action, duration, weight)
         self.height = height
 
     def get_spent_calories(self) -> float:
         """Получить количество калорий во время ходьбы"""
 
-        return ((self.CAL_MULT_35 * self.weight
+        return ((self.CALORIES_WEIGHT_COEF * self.weight
                  + ((self.get_mean_speed() * self.KMH_TO_MS) ** 2
                     / (self.height / self.CM_TO_M))
-                 * self.CAL_MULT_29 * self.weight)
+                 * self.CALORIES_HEIGHT_COEF * self.weight)
                 * self.duration * self.MIN_IN_H)
 
 
@@ -97,7 +102,13 @@ class Swimming(Training):
     SPEED_MULTIPLIER: int = 2
     """Тренировка: плавание."""
 
-    def __init__(self, action, duration, weight, length_pool, count_pool):
+    def __init__(self,
+                 action: int,
+                 duration: float,
+                 weight: float,
+                 length_pool: int,
+                 count_pool: int
+                 ) -> None:
         super().__init__(action, duration, weight)
         self.length_pool = length_pool
         self.count_pool = count_pool
